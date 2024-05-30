@@ -27,6 +27,8 @@ bot = Client("bot",
              api_id= 25434657 ,
              api_hash= "22cfc54f94cf17360dc1475a51e38518")
 
+#global Variables 
+log_channel_id = -1002149340418
 
 @bot.on_message(filters.command(["start"]) & filters.user(ADMINS))
 async def account_login(bot: Client, m: Message):
@@ -37,7 +39,6 @@ async def account_login(bot: Client, m: Message):
 async def restart_handler(_, m):
     await m.reply_text("**STOPPED**🛑🛑", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
-
 
 
 @bot.on_message(filters.command(["GURJAR"]))
@@ -175,8 +176,9 @@ async def account_login(bot: Client, m: Message):
                 if "drive" in url:
                     try:
                         ka = await helper.download(url, name)
-                        copy = await bot.send_document(chat_id=m.chat.id,document=ka, caption=cc1)
-                        await copy.copy(chat_id = -1002209397514)
+                        message = await bot.send_document(chat_id=m.chat.id,document=ka, caption=cc1)  # Sending copy to log channel
+                        file_id = message.document.file_id
+                        await bot.send_document(chat_id=log_channel_id, document=ka, caption=cc1)
                         count+=1
                         os.remove(ka)
                         time.sleep(1)
@@ -189,8 +191,9 @@ async def account_login(bot: Client, m: Message):
                         cmd = f'yt-dlp -o "{name}.pdf" "{url}"'
                         download_cmd = f"{cmd} -R 25 --fragment-retries 25"
                         os.system(download_cmd)
-                        copy = await bot.send_document(chat_id=m.chat.id,document=f'{name}.pdf', caption=cc1)
-                        await copy.copy(chat_id = -1002209397514)
+                        message = await bot.send_document(chat_id=m.chat.id, document=f'{name}.pdf', caption=cc1)
+                        file_id = message.document.file_id
+                        await bot.send_document(chat_id=log_channel_id, document=file_id, caption=cc1) 
                         count += 1
                         os.remove(f'{name}.pdf')
                     except FloodWait as e:
@@ -202,7 +205,7 @@ async def account_login(bot: Client, m: Message):
                     res_file = await helper.download_video(url, cmd, name)
                     filename = res_file
                     await prog.delete(True)
-                    await helper.send_vid(bot, m, cc, filename, thumb, name)
+                    await helper.send_vid(bot, m, cc, filename, thumb, name, log_channel_id)
                     count += 1
 
             except Exception as e:
