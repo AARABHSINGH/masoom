@@ -108,7 +108,7 @@ async def download_video(url, cmd, name):
 
 #-----------------Send it to the log channel-----------------------
 async def send_doc(bot: Client, m: Message, cc, ka, cc1, count, name, log_channel_id):
-    reply = await m.reply_text(f"**Uploading ..🚀..** - `{name}`\n╰────⌈**ʟʊʍɨռǟռȶ✨**⌋────╯")
+    reply = await m.reply_text(f"**Uploading ..🚀..** - `{name}`\n╰────⌈**@MASOOMGURJARTG**⌋────╯")
     time.sleep(1)
     # Upload the document and capture the message
     message = await m.reply_document(ka, caption=cc1)
