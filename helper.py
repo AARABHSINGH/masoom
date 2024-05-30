@@ -106,14 +106,29 @@ async def download_video(url, cmd, name):
         return os.path.isfile.splitext[0] + "." + "mp4"
 
 
+#-----------------Send it to the log channel-----------------------
+async def send_doc(bot: Client, m: Message, cc, ka, cc1, count, name, log_channel_id):
+    reply = await m.reply_text(f"**Uploading ..🚀..** - `{name}`\n╰────⌈**ʟʊʍɨռǟռȶ✨**⌋────╯")
+    time.sleep(1)
+    # Upload the document and capture the message
+    message = await m.reply_document(ka, caption=cc1)
+    # Capture the file_id of the uploaded document
+    file_id = message.document.file_id
+    # Send the document to the log channel using file_id
+    await bot.send_document(log_channel_id, file_id, caption=cc1)    
+    # Increment count
+    count += 1
+    # Delete the reply message
+    await reply.delete(True)
+    # Remove the local file
+    time.sleep(1)
+    os.remove(ka)
+    time.sleep(3)
 
-async def send_vid(bot: Client, m: Message, cc, filename, thumb, name):
 
-    subprocess.run(
-        f'ffmpeg -i "{filename}" -ss 00:01:00 -vframes 1 "{filename}.jpg"',
-        shell=True)
-   # await prog.delete(True)
-   # reply = await m.reply_text(f"**Uploading ...** - `{name}`")
+async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, log_channel_id):
+    subprocess.run(f'ffmpeg -i "{filename}" -ss 00:00:12 -vframes 1 "{filename}.jpg"', shell=True)
+    reply = await m.reply_text(f"**Uploading .. 🚀..** - `{name}`\n╰────⌈**@MASOOMGURJARTG**⌋────╯")
     try:
         if thumb == "no":
             thumbnail = f"{filename}.jpg"
@@ -121,24 +136,34 @@ async def send_vid(bot: Client, m: Message, cc, filename, thumb, name):
             thumbnail = thumb
     except Exception as e:
         await m.reply_text(str(e))
+        return
 
     dur = int(duration(filename))
-
-    start_time = time.time()
+    # Displaying a temporary message while processing
+    processing_msg = await m.reply_text("⛈")
 
     try:
-        copy = await bot.send_video(chat_id=m.chat.id,video=filename,caption=cc, supports_streaming=True,height=720,width=1280,thumb=thumbnail,duration=dur) #, progress=progress_bar,progress_args=(reply,start_time))
-        await copy.copy(chat_id = LOG) 
-    except TimeoutError:
-        await asyncio.sleep(5) 
-        copy = await bot.send_video(chat_id=m.chat.id,video=filename,caption=cc, supports_streaming=True,height=720,width=1280,thumb=thumbnail,duration=dur) #, progress=progress_bar,progress_args=(reply,start_time))
-        await copy.copy(chat_id = LOG)       
-    except Exception:
-        copy = await bot.send_video(chat_id=m.chat.id,video=filename,caption=cc, supports_streaming=True,height=720,width=1280,thumb=thumbnail,duration=dur) #progress=progress_bar,progress_args=(reply,start_time))
-        await copy.copy(chat_id = LOG)
+        # Send video to user and capture the message
+        message = await m.reply_video(filename, caption=cc, supports_streaming=True, height=720, width=1280, thumb=thumbnail, duration=dur)
+        file_id = message.video.file_id  # Capture the file_id of the uploaded video
+    except Exception as e:
+        logging.error(e)
+        # If sending video fails, send as document and capture the message
+        message = await m.reply_document(filename, caption=cc)
+        file_id = message.document.file_id  # Capture the file_id of the uploaded document
 
+    await reply.delete (True)
+    # Delete the temporary processing message
+    await processing_msg.delete (True)
+    # Send the video to the log channel using file_id
 
+    try:
+        await bot.send_video(log_channel_id, file_id, caption=cc, supports_streaming=True)
+    except Exception as e:
+        logging.error(f"Failed to send video to log channel: {e}")
+        # If sending video fails, send as document using file_id
+        await bot.send_document(log_channel_id, file_id, caption=cc)
+    
+    # Clean up
     os.remove(filename)
-
     os.remove(f"{filename}.jpg")
-   # await prog.delete(True)
