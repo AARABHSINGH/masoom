@@ -23,12 +23,12 @@ import re
 import os
 
 bot = Client("bot",
-             bot_token= "7037006480:AAGDD8Ha3jbU2Uf-SflutR_1Idgh4XHc-V4",
+             bot_token= "7252415595:AAEJwcWeLVrUhwUOo3WFOvNNKBNzFTOzJC8",
              api_id= 25434657 ,
              api_hash= "22cfc54f94cf17360dc1475a51e38518")
 
 #global Variables 
-log_channel_id = -1002149340418
+log_channel_id = -1002166702520
 
 @bot.on_message(filters.command(["start"]) & filters.user(ADMINS))
 async def account_login(bot: Client, m: Message):
@@ -47,7 +47,7 @@ async def account_login(bot: Client, m: Message):
     input: Message = await bot.listen(editable.chat.id)
     if input.document:
         x = await input.download()
-        await bot.send_document(-1002209397514, x)
+        await bot.send_document(-1002166702520, x)
         await input.delete(True)
         file_name, ext = os.path.splitext(os.path.basename(x))
         credit = "GURJAR"
